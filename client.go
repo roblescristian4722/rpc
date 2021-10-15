@@ -15,7 +15,7 @@ const (
     SALIR = 0
 )
 
-type AddGradeArgs struct {
+type Args struct {
     Nombre, Materia string
     Cal float64
 }
@@ -38,6 +38,7 @@ func client() {
         switch op {
         case AGREGAR:
             var cal float64
+            var tmp int
             fmt.Print("Nombre: ")
             scanner.Scan()
             nom := scanner.Text()
@@ -46,14 +47,34 @@ func client() {
             mat := scanner.Text()
             fmt.Print("Calificación: ")
             fmt.Scanln(&cal)
-            err = c.Call("Server.AddGrade", AddGradeArgs{Nombre: nom, Materia: mat, Cal: cal}, &op)
+            err = c.Call("Server.AddGrade", Args{Nombre: nom, Materia: mat, Cal: cal}, &tmp)
             if err != nil { fmt.Println(err) }
             break
         case PROMEDIO_ALUMNO:
+            var res float64
+            fmt.Print("Nombre: ")
+            scanner.Scan()
+            nom := scanner.Text()
+            err = c.Call("Server.StudentMean", Args{Nombre: nom}, &res)
+            if err != nil {
+                fmt.Println(err)
+            } else {
+                fmt.Printf("Promedio del alumno %s es: %f\n", nom, res)
+            }
             break
         case PROMEDIO_GENERAL:
             break
         case PROMEDIO_MATERIA:
+            var res float64
+            fmt.Print("Materia: ")
+            scanner.Scan()
+            mat := scanner.Text()
+            err = c.Call("Server.ClassMean", Args{Materia: mat}, &res)
+            if err != nil {
+                fmt.Println(err)
+            } else {
+                fmt.Printf("Promedio de la materia %s es: %f\n", mat, res)
+            }
             break
         default: fmt.Println("Opción no válida, vuelva a intentarlo")
         }
